@@ -2659,7 +2659,6 @@
                 case 'stories':
                     const subtext = `<span class="text-xs ${item.isPublished === false ? 'text-yellow-400' : 'text-green-400'} border ${item.isPublished === false ? 'border-yellow-400' : 'border-green-400'} rounded-full px-2 py-0.5">${item.isPublished === false ? 'Unpublished' : 'Published'}</span>`;
                     const createdDate = new Date(item.createdAt || item.timestamp || 0).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                    const hideMovieSeriesActions = isJuniorAdmin() && ['movies', 'series'].includes(view);
                     return `
                         <div class="flex items-start gap-4 w-full">
                             <img src="${item.posterUrl}" class="w-16 h-24 object-cover rounded flex-shrink-0 bg-gray-700" onerror="this.style.display='none'">
@@ -2676,12 +2675,10 @@
                                 </div>
                                 <div class="mt-2">${item.isPublished !== undefined ? subtext : ''}</div>
                             </div>
-                            ${hideMovieSeriesActions ? '' : `
-                                <div class="flex flex-col space-y-2 flex-shrink-0">
-                                    <button data-id="${item.id}" class="edit-btn ${subButtonClass} w-full px-4">Edit</button>
-                                    <button data-id="${item.id}" class="delete-btn ${subButtonClass} bg-red-800/80 hover:bg-red-700 w-full px-4">Delete</button>
-                                </div>
-                            `}
+                            <div class="flex flex-col space-y-2 flex-shrink-0">
+                                <button data-id="${item.id}" class="edit-btn ${subButtonClass} w-full px-4">Edit</button>
+                                <button data-id="${item.id}" class="delete-btn ${subButtonClass} bg-red-800/80 hover:bg-red-700 w-full px-4">Delete</button>
+                            </div>
                         </div>
                     `;
                 case 'users':
@@ -2975,10 +2972,6 @@
         const handleDelete = async (e) => {
             const id = e.target.dataset.id;
             if (!id) return;
-            if (isJuniorAdmin() && ['movies', 'series'].includes(currentView)) {
-                alert('Admin wa kawaida hawezi kufuta movie au series.');
-                return;
-            }
             let dbPath = currentView;
             const matchingItem = getContentCacheByView(currentView).find(item => item.id === id);
             if (isJuniorAdmin() && matchingItem && !isOwnedByCurrentAdmin(matchingItem)) {
@@ -3013,11 +3006,6 @@
         const handleEdit = async (e) => {
             const id = e.target.dataset.id;
             editId = id;
-            if (isJuniorAdmin() && ['movies', 'series'].includes(currentView)) {
-                alert('Admin wa kawaida hawezi ku-edit movie au series zilizopo.');
-                editId = null;
-                return;
-            }
             
             if (currentView === 'users') {
                 document.getElementById('user-uid').value = id;
