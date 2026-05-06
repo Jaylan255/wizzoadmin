@@ -193,7 +193,8 @@
             'xxx-banners',
             'stories',
             'story-genres',
-            'story-banners'
+            'story-banners',
+            'users'
         ];
         const JUNIOR_ADMIN_LOCK_WINDOW_MS = 8 * 24 * 60 * 60 * 1000;
         const ADMIN_SESSION_STORAGE_KEY = 'swamedia_admin_session';
@@ -542,6 +543,16 @@
                 name: matchedCredential.name,
                 username: matchedCredential.username
             });
+            if (matchedCredential.role === 'junior') {
+                try {
+                    await update(ref(db, 'settings/juniorAdminTracking'), {
+                        lastLoginAt: Date.now(),
+                        lastLoginUsername: matchedCredential.username
+                    });
+                } catch (trackingError) {
+                    console.error('Failed to update junior admin login tracking:', trackingError);
+                }
+            }
             currentView = sanitizeRequestedView(currentView || getViewFromLocation());
             showAdminPanel();
 
